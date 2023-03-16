@@ -1,0 +1,130 @@
+1.	采用最少权限的原则
+运行脚本或执行代码的进程应当尽可能用权限最少的帐户运行，从而在危及进程安全时限制可能造成的破坏。如果恶意用户设法将代码注入某个服务器进程，那么授予该进程的权限会在很大程度上决定该用户可执行的操作类型。应当将需要更多信任（和更高权限）的代码分别隔离在不同的进程内。
+2.	使用纵深防御
+在应用程序中的每一层和每个子系统中设置检查点。检查点是网关守卫，它们确保只有经过身份验证和授权的用户能够访问下一个下游层。 
+3.	不要信任用户输入
+应用程序彻底验证所有用户输入，然后再根据用户输入执行操作。验证可能包括筛选特殊字符。针对用户意外地错误使用和某些人通过在系统中注入恶意命令蓄意进行攻击的情况，这种预防性措施对应用程序起到了保护作用。常见的攻击包括 SQL 注入攻击、脚本注入和缓冲区溢出。 
+4.	使用默认安全设置
+杜绝仅仅为了使应用程序运行而使用安全性较低的设置。如果应用程序所需的功能不得不减小默认安全设置的安全级别或更改默认的安全设置，在更改前，充分测试更改所带来的后果，并了解可能带来的隐患。 
+5.	不要通过隐藏来保障安全
+尝试使用让人迷惑的变量名来隐藏机密信息或将它们存储在不常用的文件位置，这些方法都不能提供绝对的安全保障。最好使用平台功能或使用已被证实可行的技术来保护数据。 
+6.	在关口进行检查
+在关口检查客户端意思是在第一个身份验证点（例如，Web 服务器上的 Web 应用程序内）授予用户权限，并确定允许用户访问的资源和操作（可能由下游服务提供）。如果在关口设计可靠的身份验证和授权策略，就不必将原调用方的安全上下文一路委派到应用程序数据层。 
+7.	假定外部系统是不安全的系统
+如果外部系统不归您所有，不要假定有人为您保证安全。 
+8.	减小表面区域
+避免公开不需要公开的信息。如果公开这些信息，就可能进一步引起漏洞。同时，处理错误的方式一定要适当。向最终用户返回错误消息时，不要公开任何不需要公开的信息。 
+9.	以安全的方式显示错误消息
+如果应用程序失败，一定要保护好机密数据。同时，不要在错误消息中提供过于详细的数据，也就是不要提供任何有助于攻击者发现应用程序漏洞的详细信息。详细的错误信息应写入 Windows 事件日志。 
+10,	不要忘记您的安全程度受最薄弱环节制约
+考虑安全性时，应该将应用程序所有层的安全性都考虑在内。 
+11.	禁用不使用的内容
+通过禁用应用程序不需要的模块和组件来去除一些潜在的攻击点。例如，如果应用程序不使用输出缓存，则应禁用 ASP.NET 输出缓存模块。这样，即使以后在该模块中发现安全漏洞，应用程序也不会受到威胁。
+
+
+代码安全加强实施细节
+
+
+1.Web 应用程序执行时如果发生异常,通过配置严禁将任何技术信息暴露:
+	Web.Config: <customErrors mode="RemoteOnly" />
+
+2.在客户端应用程序
+	2.1 程序代码中一定要拼接 "参数化 SQL" ,并采取安全的"命令参数式" ADO.Net API
+		,连接数据库并提交该查询,另外今后尽量减少应用程序拼接 SQL,而多使用存储过程。
+		参阅如下代码:
+
+private void cmdLogin_Click(object sender, System.EventArgs e)
+{
+	string strCnx = ConfigurationSettings.AppSettings["cnxNWindBad"];
+	using (SqlConnection cnx = new SqlConnection(strCnx))
+	{
+		SqlParameter prm;
+		cnx.Open();
+		string TableName = "[users]";
+		string strQry =
+			//注意 @username 和 @password 就是前面所指参数化 SQL 中的参数
+			//可以理解为是 "字段值" 的"值占位符",不要用它去占位表名、列名、以及关键字
+			//同时用户交互录入的也的确只能是 "字段值"
+			//这样 ADO.Net + SQL Server 就可以自动免疫,免于被注入恶意但语法正确的 SQL
+			"SELECT Count(*) FROM " + TableName +  " WHERE UserName=@username " +
+			"AND Password=@password";
+		int intRecs;
+		SqlCommand cmd = new SqlCommand(strQry, cnx);
+		cmd.CommandType= CommandType.Text;
+		prm = new SqlParameter("@username",SqlDbType.VarChar,50);
+		prm.Direction=ParameterDirection.Input;
+		prm.Value = txtUser.Text;
+		cmd.Parameters.Add(prm);
+		prm = new SqlParameter("@password",SqlDbType.VarChar,50);
+		prm.Direction=ParameterDirection.Input;
+		prm.Value = txtPassword.Text;
+		cmd.Parameters.Add(prm);
+		intRecs = (int) cmd.ExecuteScalar();
+		if (intRecs>0)
+		{
+			FormsAuthentication.RedirectFromLoginPage(txtUser.Text, false);
+		}
+		else
+		{
+			lblMsg.Text = "Login attempt failed.";
+		}
+	}
+}
+	2.2 程序代码中直接调用存储过程,采取安全的"命令参数式" ADO.Net API,连接数据库并提交,
+		不要以 CommandType.Text 的方式使用ADO.Net API 执行类似 exec sp_help 'sysobjects' 语句。
+		参阅代码同前
+
+
+3.数据库服务器端程序
+	3.2 存储过程 T-SQL 程序代码中,如果其传入参数只用于静态 SQL ,且客户端采取安全的"命令参数式"
+		ADO.Net API 调用该存储过程,则是安全代码,自动免疫 SQL 注入攻击。
+		参阅如下代码:
+静态 SQL 代码:
+declare @value varchar(100)
+set @value = 'sys'' or 1=1 --' --根本无法注入恶意 sql,得到所有记录,因为 @value 被认为是一个"值"
+select * from sysobjects where name like '%' + @value +'%'
+
+存储过程:
+create procedure zsp_WithStaticSQL
+@Parameter varchar(100)
+as
+select *
+from sysobjects
+where name = @Parameter
+
+	3.3 存储过程 T-SQL 程序代码中,如果其传入参数被用于拼接动态 SQL,该参数应该只接受"值",
+		,而不要用于传入包含表名、列名、关键字的 SQL 语句的一部分,并将该存储过程参数用于
+		构造参数化的动态 SQL,并使用 sp_executesql 及其形参声明参数,实参参数执行,
+		而绝对禁止直接拼接 SQL,并 exec 执行
+create proc zsp_WithParameterizedDynamicSQL
+ @Value varchar(20)
+,@OutValue int output
+as
+--用于保存动态 SQL 的一定要使用 nvarchar 数据类型
+declare @sql nvarchar(200) 
+set @sql = 'select * from sysobjects' 
+if @value = null or len(@value) > 0
+begin
+  --@value 是存储过程的参数,将其拼接到动态 sql 语句中,起到了一个"字段值"的"值占位符"的作用
+  --(一般是"="右边的以"@"开始的 T-SQL 变量)
+  --从而构造出安全的 "参数化动态SQL"
+  set @sql = @sql + ' where name like (''%'' + @ +''%'')'
+end
+
+select @sql
+--
+exec sp_executesql @sql
+  , N'@ varchar(20)'
+  , @value
+
+set @OutValue = @@rowcount
+GO
+
+
+
+declare @ varchar(100)
+set @ = 'sys'
+set @ = '''%''--'
+declare @i int
+exec zsp_WithParameterizedDynamicSQL @,@i out
+select @i

@@ -1,0 +1,56 @@
+﻿<!-- sample.html -->
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+    <title> new document </title>
+    <meta name="generator" content="editplus" />
+    <meta name="author" content="" />
+    <meta name="keywords" content="" />
+    <meta name="description" content="" />
+</head>
+<body>
+<script type="text/javascript" language="javascript">
+    function _0hi1(ClientID, EncryptMode, EncryptData/*, RSAPublicKey*/, RSASignature)
+    {
+        document.getElementById("t1").value = ClientID + ": " + EncryptMode + "; " + EncryptData;
+//        alert("Client ID: " + ClientID);
+//        alert("Encrypt Mode: " + EncryptMode);
+//        alert("Encrypt Data: " + EncryptData);
+//        //alert("Response RSA Public Key: " + RSAPublicKey);
+//        alert("Response RSA Signature: " + RSASignature);
+    }
+</script>
+<table border="1">
+    <tr>
+        <td align="center">
+<script type="text/javascript" language="javascript" src="http://service.captcha.net/captchaplaceholder.aspx?id=1&l=4&h=50&callback=_0hi1&sign=sha1&w=180&refresh=refresh&rsa=%3cRSAKeyValue%3e%3cModulus%3etvWiOBhMJy8t0aZ7futbIm7IPrrTCH4fwl%2f4ut360k5syBFVW%2fWyN50j1aUJmnsp1pPXjt6uGfGNVVOxB9Hku7ppg%2fpNb2xHGau1Yw4EBTpmyR0jq0YjhluxDQkzQzqWZZwiZRluJ5MMT%2fWDgn90aeD%2fadNlir%2fZWsKegpW%2fKbc%3d%3c%2fModulus%3e%3cExponent%3eAQAB%3c%2fExponent%3e%3c%2fRSAKeyValue%3e">
+</script>
+<!-- <script type="text/javascript" language="javascript" src="http://service.captcha.net/captchaplaceholder.aspx?id=1&l=4&h=50&callback=%22;\u0064ocument.write('\u003cscript\u003ealert(
+%22 Encode script XSS Attack%22)\u003c/script\u003e');alert('Plain script Xss Attack callback'); var a = %22%22;//_0123ac&sign=sha1&w=150&refresh=_0hi1&rsa=%3cRSAKeyValue%3e%3cModulus%3etvWiOBhMJy8t0aZ7futbIm7IPrrTCH4fwl%2f4ut360k5syBFVW%2fWyN50j1aUJmnsp1pPXjt6uGfGNVVOxB9Hku7ppg%2fpNb2xHGau1Yw4EBTpmyR0jq0YjhluxDQkzQzqWZZwiZRluJ5MMT%2fWDgn90aeD%2fadNlir%2fZWsKegpW%2fKbc%3d%3c%2fModulus%3e%3cExponent%3eAQAB%3c%2fExponent%3e%3c%2fRSAKeyValue%3e"></script> -->
+        </td>
+    </tr>
+    <tr>
+        <td align="center">
+<button onclick= "refresh()">refresh</button>
+        </td>
+    </tr>
+</table>
+<br>
+<input id="t1"  type="text" />
+<p>
+<script type="text/javascript" language="javascript">
+    function _hi2(ClientID, EncryptMode, EncryptData/*, RSAPublicKey*/, RSASignature)
+    {
+        document.getElementById("t2").value = ClientID + ": " + EncryptMode + "; " + EncryptData;
+//        alert("Client ID: " + ClientID);
+//        alert("Encrypt Mode: " + EncryptMode);
+//        alert("Encrypt Data: " + EncryptData);
+//        //alert("Response RSA Public Key: " + RSAPublicKey);
+//        alert("Response RSA Signature: " + RSASignature);
+    }
+</script>
+<script type="text/javascript" language="javascript" src="http://service.captcha.net/captchaplaceholder.aspx?id=2&sign=md5&l=4&w=180&h=50&callback=_hi2">
+</script>
+<input id="t2"  type="text" />
+</body>
+</html>

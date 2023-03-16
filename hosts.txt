@@ -1,0 +1,2 @@
+127.0.0.1	service.captcha.net
+127.0.0.1	www.contoso.com
